@@ -1,3 +1,5 @@
+use std::alloc::Layout;
+
 pub mod algo;
 pub mod concurrency;
 
@@ -10,21 +12,11 @@ pub fn sum_even(values: &[i64]) -> i64 {
 
 /// Подсчёт ненулевых байтов. Буфер намеренно не освобождается,
 /// что приведёт к утечке памяти (Valgrind это покажет).
+/// Мы могли бы использователь std::alloc::dealloc(raw, Layout::array::<u8>(len)
+/// для освобождения памяти и оставив функцию небезопасной, но в этом
+/// нет необходимости
 pub fn leak_buffer(input: &[u8]) -> usize {
-    let boxed = input.to_vec().into_boxed_slice();
-    let len = input.len();
-    let raw = Box::into_raw(boxed) as *mut u8;
-
-    let mut count = 0;
-    unsafe {
-        for i in 0..len {
-            if *raw.add(i) != 0_u8 {
-                count += 1;
-            }
-        }
-        // утечка: не вызываем Box::from_raw(raw);
-    }
-    count
+    input.iter().filter(|&&x| x != 0).count()
 }
 
 /// Небрежная нормализация строки: удаляем пробелы и приводим к нижнему регистру,
@@ -55,7 +47,7 @@ pub unsafe fn use_after_free() -> i32 {
 
 #[cfg(test)]
 mod tests {
-    use crate::{average_positive, sum_even};
+    use crate::{average_positive, leak_buffer, sum_even};
 
     #[test]
     fn test_sum_even() {
@@ -71,5 +63,13 @@ mod tests {
         assert_eq!(average_positive(&[-1000, -2, 0, 2, 1]), 1.5);
         assert_eq!(average_positive(&[1]), 1.0);
         assert_eq!(average_positive(&[-5]), 0.0);
+    }
+
+    #[test]
+    fn test_leak_buffer() {
+        assert_eq!(leak_buffer(&[0]), 0);
+        assert_eq!(leak_buffer(&[1, 255]), 2);
+        assert_eq!(leak_buffer(&[0, 0]), 0);
+        assert_eq!(leak_buffer(&[]), 0);
     }
 }
