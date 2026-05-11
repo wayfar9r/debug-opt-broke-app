@@ -36,11 +36,11 @@ pub fn normalize(input: &str) -> String {
 /// Логическая ошибка: усредняет по всем элементам, хотя требуется учитывать
 /// только положительные. Деление на длину среза даёт неверный результат.
 pub fn average_positive(values: &[i64]) -> f64 {
-    let sum: i64 = values.iter().sum();
-    if values.is_empty() {
-        return 0.0;
-    }
-    sum as f64 / values.len() as f64
+    let (sum, count) = values
+        .iter()
+        .filter(|&&x| x > 0)
+        .fold((0f64, 0u32), |(sum, count), &x| (sum + x as f64, count + 1));
+    if count == 0 { 0.0 } else { sum / count as f64 }
 }
 
 /// Use-after-free: возвращает значение после освобождения бокса.
@@ -55,7 +55,7 @@ pub unsafe fn use_after_free() -> i32 {
 
 #[cfg(test)]
 mod tests {
-    use crate::sum_even;
+    use crate::{average_positive, sum_even};
 
     #[test]
     fn test_sum_even() {
@@ -63,5 +63,13 @@ mod tests {
         assert_eq!(sum_even(&[]), 0);
         assert_eq!(sum_even(&[-1]), 0);
         assert_eq!(sum_even(&[100]), 100);
+    }
+
+    #[test]
+    fn test_average_positive() {
+        assert_eq!(average_positive(&[]), 0.0);
+        assert_eq!(average_positive(&[-1000, -2, 0, 2, 1]), 1.5);
+        assert_eq!(average_positive(&[1]), 1.0);
+        assert_eq!(average_positive(&[-5]), 0.0);
     }
 }
