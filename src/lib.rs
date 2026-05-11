@@ -42,7 +42,7 @@ pub fn use_after_free() -> i32 {
 
 #[cfg(test)]
 mod tests {
-    use crate::{average_positive, leak_buffer, sum_even, use_after_free};
+    use crate::{average_positive, leak_buffer, normalize, sum_even, use_after_free};
 
     #[test]
     fn test_sum_even() {
@@ -71,5 +71,16 @@ mod tests {
     #[test]
     fn test_use_after_free() {
         use_after_free();
+    }
+
+    #[test]
+    fn test_normalize_text() {
+        assert_eq!(normalize("  input      "), "input");
+        assert_eq!(
+            normalize("  input  input               input  "),
+            "inputinputinput"
+        );
+        assert_eq!(normalize(""), "");
+        assert_eq!(normalize("input"), "input");
     }
 }

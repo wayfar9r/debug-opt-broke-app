@@ -1,4 +1,6 @@
-use broken_app::{algo, leak_buffer, normalize, sum_even, use_after_free};
+use broken_app::{
+    algo, concurrency::race_increment, leak_buffer, normalize, sum_even, use_after_free,
+};
 
 fn main() {
     let nums = [1, 2, 3, 4];
@@ -17,4 +19,6 @@ fn main() {
     println!("dedup: {:?}", uniq);
 
     use_after_free();
+
+    race_increment(2, 2);
 }

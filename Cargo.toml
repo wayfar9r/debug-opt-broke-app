@@ -15,7 +15,7 @@ harness = false
 
 [[bench]]
 name = "criterion"
-harnes = false
+harness = false
 
 [profile.release]
 debug = true
