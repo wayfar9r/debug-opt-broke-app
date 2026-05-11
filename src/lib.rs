@@ -1,5 +1,3 @@
-use std::alloc::Layout;
-
 pub mod algo;
 pub mod concurrency;
 
@@ -37,17 +35,14 @@ pub fn average_positive(values: &[i64]) -> f64 {
 
 /// Use-after-free: возвращает значение после освобождения бокса.
 /// UB, проявится под ASan/Miri.
-pub unsafe fn use_after_free() -> i32 {
+pub fn use_after_free() -> i32 {
     let b = Box::new(42_i32);
-    let raw = Box::into_raw(b);
-    let val = *raw;
-    drop(Box::from_raw(raw));
-    val + *raw
+    *b + *b
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{average_positive, leak_buffer, sum_even};
+    use crate::{average_positive, leak_buffer, sum_even, use_after_free};
 
     #[test]
     fn test_sum_even() {
@@ -71,5 +66,12 @@ mod tests {
         assert_eq!(leak_buffer(&[1, 255]), 2);
         assert_eq!(leak_buffer(&[0, 0]), 0);
         assert_eq!(leak_buffer(&[]), 0);
+    }
+
+    #[test]
+    fn test_use_after_free() {
+        unsafe {
+            use_after_free();
+        }
     }
 }
