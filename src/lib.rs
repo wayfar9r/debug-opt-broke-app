@@ -70,8 +70,6 @@ mod tests {
 
     #[test]
     fn test_use_after_free() {
-        unsafe {
-            use_after_free();
-        }
+        use_after_free();
     }
 }
