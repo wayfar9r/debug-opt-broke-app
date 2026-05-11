@@ -5,16 +5,7 @@ pub mod concurrency;
 /// Здесь намеренно используется `get_unchecked` с off-by-one,
 /// из-за чего возникает UB при доступе за пределы среза.
 pub fn sum_even(values: &[i64]) -> i64 {
-    let mut acc = 0;
-    unsafe {
-        for idx in 0..=values.len() {
-            let v = *values.get_unchecked(idx);
-            if v % 2 == 0 {
-                acc += v;
-            }
-        }
-    }
-    acc
+    values.iter().filter(|&&x| x % 2 == 0).sum()
 }
 
 /// Подсчёт ненулевых байтов. Буфер намеренно не освобождается,
@@ -60,4 +51,17 @@ pub unsafe fn use_after_free() -> i32 {
     let val = *raw;
     drop(Box::from_raw(raw));
     val + *raw
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::sum_even;
+
+    #[test]
+    fn test_sum_even() {
+        assert_eq!(sum_even(&[-1, 0, 2, 5]), 2);
+        assert_eq!(sum_even(&[]), 0);
+        assert_eq!(sum_even(&[-1]), 0);
+        assert_eq!(sum_even(&[100]), 100);
+    }
 }
