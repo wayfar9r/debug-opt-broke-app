@@ -1,0 +1,38 @@
+cargo +nightly miri run --bin demo
+warning: unused manifest key: bench.1.harnes
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running `/home/art/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/bin/cargo-miri runner target/miri/x86_64-unknown-linux-gnu/debug/demo`
+sum_even: 6
+non-zero bytes: 3
+normalize: helloworld
+fib(20): 6765
+dedup: [1, 2, 3, 4]
+error: Undefined Behavior: Data race detected between (1) non-atomic write on thread `unnamed-1` and (2) non-atomic read on thread `unnamed-2` at alloc6340
+  --> src/concurrency.rs:15:21
+   |
+15 |                     COUNTER += 1;
+   |                     ^^^^^^^^^^^^ (2) just happened here
+   |
+help: and (1) occurred earlier here
+  --> src/concurrency.rs:15:21
+   |
+15 |                     COUNTER += 1;
+   |                     ^^^^^^^^^^^^
+   = help: this indicates a bug in the program: it performed an invalid operation, and caused Undefined Behavior
+   = help: see https://doc.rust-lang.org/nightly/reference/behavior-considered-undefined.html for further information
+   = note: this is on thread `unnamed-2`
+note: the current function got called indirectly due to this code
+  --> src/concurrency.rs:12:22
+   |
+12 |           handles.push(thread::spawn(move || {
+   |  ______________________^
+13 | |             for _ in 0..iterations {
+14 | |                 unsafe {
+15 | |                     COUNTER += 1;
+...  |
+18 | |         }));
+   | |__________^
+
+note: some details are omitted, run with `MIRIFLAGS=-Zmiri-backtrace=full` for a verbose backtrace
+
+error: aborting due to 1 previous error
