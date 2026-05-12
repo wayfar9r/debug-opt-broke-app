@@ -12,3 +12,5 @@ carego +nightly miri test
 ### Отчеты до оптимитации [файл](artifacts/before_optimize)
 
 ### Отчеты после оптимизации [файл](artifacts/after_optimize)
+
+### Эталон https://github.com/wayfar9r/reference-app.git
