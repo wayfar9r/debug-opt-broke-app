@@ -33,4 +33,16 @@ pub fn reset_counter() {
 }
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use crate::concurrency::{COUNTER, race_increment, read_after_sleep, reset_counter};
+
+    #[test]
+    fn basic_test_concurrency() {
+        assert_eq!(race_increment(2, 3), 6);
+        reset_counter();
+        assert_eq!(COUNTER.load(std::sync::atomic::Ordering::SeqCst), 0);
+        assert_eq!(read_after_sleep(), 0);
+        race_increment(1, 1);
+        assert_eq!(COUNTER.load(std::sync::atomic::Ordering::SeqCst), 1);
+    }
+}
