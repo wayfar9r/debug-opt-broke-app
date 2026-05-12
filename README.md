@@ -5,7 +5,7 @@ debug and optimize broken app
 ## Использовавшиеся команды
 
 cargo +nightly miri run --bin demo
-carego +nightly miri test
+cargo +nightly miri test
 valgrind --leak-check=full target/debug/demo
 
 ### Баги [файл](artifacts/FOUND_BUGS.md)
