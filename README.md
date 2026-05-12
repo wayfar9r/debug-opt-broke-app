@@ -7,6 +7,11 @@ debug and optimize broken app
 cargo +nightly miri run --bin demo
 cargo +nightly miri test
 valgrind --leak-check=full target/debug/demo
+valgrind --leak-check=full cargo test --tests
+RUSTFLAGS="-Zsanitizer=address" cargo +nightly run --bin demo
+
+export RUSTFLAGS=-Zsanitizer=thread RUSTDOCFLAGS=-Zsanitizer=thread
+cargo +nightly test -Zbuild-std --target x86_64-unknown-linux-gnu
 
 ### Баги [файл](artifacts/FOUND_BUGS.md)
 
