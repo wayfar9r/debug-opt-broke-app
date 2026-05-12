@@ -31,3 +31,6 @@ pub fn read_after_sleep() -> u64 {
 pub fn reset_counter() {
     COUNTER.store(0, std::sync::atomic::Ordering::SeqCst);
 }
+
+#[cfg(test)]
+mod tests {}

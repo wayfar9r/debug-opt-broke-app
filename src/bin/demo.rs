@@ -1,5 +1,7 @@
 use broken_app::{
-    algo, concurrency::race_increment, leak_buffer, normalize, sum_even, use_after_free,
+    algo,
+    concurrency::{race_increment, read_after_sleep, reset_counter},
+    leak_buffer, normalize, sum_even, use_after_free,
 };
 
 fn main() {
@@ -21,4 +23,6 @@ fn main() {
     use_after_free();
 
     race_increment(2, 2);
+    read_after_sleep();
+    reset_counter();
 }
