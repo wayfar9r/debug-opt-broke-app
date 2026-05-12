@@ -1,0 +1,49 @@
+cargo bench
+   Compiling broken-app v0.1.0 (/home/art/projects/rust/broken-app)
+    Finished `bench` profile [optimized + debuginfo] target(s) in 3.94s
+     Running unittests src/lib.rs (target/release/deps/broken_app-cb0d93d5f59fccbc)
+
+running 6 tests
+test algo::tests::test_slow_fib ... ignored
+test tests::test_average_positive ... ignored
+test tests::test_leak_buffer ... ignored
+test tests::test_normalize_text ... ignored
+test tests::test_sum_even ... ignored
+test tests::test_use_after_free ... ignored
+
+test result: ok. 0 passed; 0 failed; 6 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/baseline.rs (target/release/deps/baseline-e3ec1219c2f3646a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/demo.rs (target/release/deps/demo-b0ec29e6ab4b669f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running benches/baseline.rs (target/release/deps/baseline-973da21c03736fb4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running benches/criterion.rs (target/release/deps/criterion-ed4336c34e5515c2)
+sum_even_broken         time:   [21.645 µs 21.709 µs 21.768 µs]
+                        change: [+2.9794% +3.4064% +3.8497%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+
+slow_fib_broken         time:   [25.481 ns 25.513 ns 25.549 ns]
+                        change: [-100.000% -100.000% -100.000%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Found 7 outliers among 100 measurements (7.00%)
+  1 (1.00%) low mild
+  5 (5.00%) high mild
+  1 (1.00%) high severe
+
+slow_dedup_broken       time:   [336.90 µs 337.91 µs 338.72 µs]
+                        change: [-97.636% -97.625% -97.615%] (p = 0.00 < 0.05)
+                        Performance has improved.

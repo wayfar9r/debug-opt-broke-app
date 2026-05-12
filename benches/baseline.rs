@@ -18,15 +18,17 @@ fn main() {
 
     // Несколько прогонов для устойчивости.
 
-    time_it("sum_even", || {
-        let _ = sum_even(&data);
-    });
+    for _ in 0..3 {
+        time_it("sum_even", || {
+            let _ = sum_even(&data);
+        });
 
-    time_it("slow_fib", || {
-        let _ = algo::slow_fib(fib_n);
-    });
+        time_it("slow_fib", || {
+            let _ = algo::slow_fib(fib_n);
+        });
 
-    time_it("slow_dedup", || {
-        let _ = algo::slow_dedup(&dedup_data);
-    });
+        time_it("slow_dedup", || {
+            let _ = algo::slow_dedup(&dedup_data);
+        });
+    }
 }
