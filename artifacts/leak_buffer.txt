@@ -1,0 +1,75 @@
+cargo +nightly miri run --bin demo
+   Compiling broken-app v0.1.0 (/home/art/projects/rust/broken-app)
+warning[E0133]: dereference of raw pointer is unsafe and requires unsafe block
+  --> src/lib.rs:51:15
+   |
+51 |     let val = *raw;
+   |               ^^^^ dereference of raw pointer
+   |
+   = note: raw pointers may be null, dangling or unaligned; they can violate aliasing rules and cause data races: all of these are undefined behavior
+note: an unsafe function restricts its caller, but its body is safe by default
+  --> src/lib.rs:48:1
+   |
+48 | pub unsafe fn use_after_free() -> i32 {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/unsafe-op-in-unsafe-fn.html>
+   = note: `#[warn(unsafe_op_in_unsafe_fn)]` (part of `#[warn(rust_2024_compatibility)]`) on by default
+
+warning[E0133]: call to unsafe function `std::boxed::Box::<T>::from_raw` is unsafe and requires unsafe block
+  --> src/lib.rs:52:10
+   |
+52 |     drop(Box::from_raw(raw));
+   |          ^^^^^^^^^^^^^^^^^^ call to unsafe function
+   |
+   = note: consult the function's documentation for information on how to avoid undefined behavior
+   = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/unsafe-op-in-unsafe-fn.html>
+
+warning[E0133]: dereference of raw pointer is unsafe and requires unsafe block
+  --> src/lib.rs:53:11
+   |
+53 |     val + *raw
+   |           ^^^^ dereference of raw pointer
+   |
+   = note: raw pointers may be null, dangling or unaligned; they can violate aliasing rules and cause data races: all of these are undefined behavior
+   = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/unsafe-op-in-unsafe-fn.html>
+
+For more information about this error, try `rustc --explain E0133`.
+warning: `broken-app` (lib) generated 3 warnings (run `cargo fix --lib -p broken-app` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.46s
+     Running `/home/art/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/bin/cargo-miri runner target/miri/x86_64-unknown-linux-gnu/debug/demo`
+sum_even: 6
+non-zero bytes: 3
+normalize: helloworld
+fib(20): 6765
+dedup: [1, 2, 3, 4]
+error: memory leaked: alloc1114 (Rust heap, size: 4, align: 1), allocated here:
+   --> /home/art/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/raw_vec/mod.rs:465:41
+    |
+465 |             AllocInit::Uninitialized => alloc.allocate(layout),
+    |                                         ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: stack backtrace:
+            0: alloc::raw_vec::RawVecInner::try_allocate_in
+                at /home/art/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/raw_vec/mod.rs:465:41: 465:63
+            1: alloc::raw_vec::RawVecInner::with_capacity_in
+                at /home/art/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/raw_vec/mod.rs:434:15: 434:92
+            2: alloc::raw_vec::RawVec::<u8>::with_capacity_in
+                at /home/art/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/raw_vec/mod.rs:177:20: 177:77
+            3: std::vec::Vec::<u8>::with_capacity_in
+                at /home/art/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/vec/mod.rs:977:20: 977:61
+            4: <u8 as std::slice::<impl [T]>::to_vec_in::ConvertVec>::to_vec::<std::alloc::Global>
+                at /home/art/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/slice.rs:448:29: 448:62
+            5: std::slice::<impl [u8]>::to_vec_in::<std::alloc::Global>
+                at /home/art/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/slice.rs:400:16: 400:38
+            6: std::slice::<impl [u8]>::to_vec
+                at /home/art/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/slice.rs:376:9: 376:31
+            7: broken_app::leak_buffer
+                at src/lib.rs:14:17: 14:31
+            8: main
+                at src/bin/demo.rs:8:36: 8:54
+
+note: some details are omitted, run with `MIRIFLAGS=-Zmiri-backtrace=full` for a verbose backtrace
+
+note: set `MIRIFLAGS=-Zmiri-ignore-leaks` to disable this check
+
+error: aborting due to 1 previous error
